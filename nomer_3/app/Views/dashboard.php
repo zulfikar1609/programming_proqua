@@ -5,7 +5,7 @@
       <div class="main-content">
         <section class="section">
           <div class="section-header">
-            <h1>Kunjungan</h1>
+            <h1>Dashboard</h1>
             <div class="section-header-breadcrumb">
               <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
               <div class="breadcrumb-item"><a href="#">Modules</a></div>
@@ -14,16 +14,14 @@
           </div>
 
           <div class="section-body">
-            <h2 class="section-title">Kunjungan</h2>
+            <h2 class="section-title">Asesmen</h2>
 
             <div class="row">
               <div class="col-12">
                 <div class="card">
-                  <?php if (session('role') != 'perawat'): ?>
                   <div class="card-header">
-                        <button class="btn btn-success">Tambah</button>
+                    <button class="btn btn-success">Tambah</button>
                   </div>
-                  <?php endif; ?>
                   <div class="card-body">
                     <div class="table-responsive">
                       <table class="table table-striped" id="table-1">
@@ -33,8 +31,8 @@
                               #
                             </th>
                             <th>Nama Pasien</th>
-                            <th>Jenis kunjungan</th>
-                            <th>Tanggal Kunjungan</th>
+                            <th>Keluhan Utama</th>
+                            <th>Keluhan Tambahan</th>
                             <th>Action</th>
                           </tr>
                         </thead>
@@ -48,10 +46,8 @@
                             <td>Perut mules</td>
                             <td>
                                 <a href="#" class="btn btn-danger"><i class="fas fa-file-pdf"></i></a>
-                                <?php if (session('role') != 'perawat'): ?>
-                                  <a href="#" class="btn btn-primary">Edit</a>
-                                  <a href="#" class="btn btn-warning">Hapus</a>
-                                <?php endif; ?>
+                                <a href="#" class="btn btn-primary">Edit</a>
+                                <a href="#" class="btn btn-warning">Hapus</a>
                             </td>
                           </tr>
                         </tbody>

@@ -19,9 +19,11 @@
             <div class="row">
               <div class="col-12">
                 <div class="card">
+                  <?php if (session('role') != 'perawat'): ?>
                   <div class="card-header">
-                    <button class="btn btn-success">Tambah</button>
+                        <button class="btn btn-success">Tambah</button>
                   </div>
+                  <?php endif; ?>
                   <div class="card-body">
                     <div class="table-responsive">
                       <table class="table table-striped" id="table-1">
@@ -46,8 +48,10 @@
                             <td>Perut mules</td>
                             <td>
                                 <a href="#" class="btn btn-danger"><i class="fas fa-file-pdf"></i></a>
-                                <a href="#" class="btn btn-primary">Edit</a>
-                                <a href="#" class="btn btn-warning">Hapus</a>
+                                <?php if (session('role') != 'perawat'): ?>
+                                  <a href="#" class="btn btn-primary">Edit</a>
+                                  <a href="#" class="btn btn-warning">Hapus</a>
+                                <?php endif; ?>
                             </td>
                           </tr>
                         </tbody>

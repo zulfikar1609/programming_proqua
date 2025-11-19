@@ -40,10 +40,15 @@
               <div class="card-header"><h4>Login</h4></div>
 
               <div class="card-body">
-                <form method="POST" action="#" class="needs-validation" novalidate="">
+                <?php if (session()->getFlashdata('error')): ?>
+                  <div class="alert alert-danger">
+                    <?= session()->getFlashdata('error') ?>
+                  </div>
+                <?php endif; ?>
+                <form method="POST" action="<?= base_url('/auth') ?>" class="needs-validation" novalidate="">
                   <div class="form-group">
                     <label for="email">Email</label>
-                    <input id="email" type="email" class="form-control" name="email" tabindex="1" required autofocus>
+                    <input id="email" type="email" class="form-control" name="email" required autofocus>
                     <div class="invalid-feedback">
                       Please fill in your email
                     </div>
@@ -51,16 +56,16 @@
 
                   <div class="form-group">
                     <div class="d-block">
-                    	<label for="password" class="control-label">Password</label>
+                      <label for="password" class="control-label">Password</label>
                     </div>
-                    <input id="password" type="password" class="form-control" name="password" tabindex="2" required>
+                    <input id="password" type="password" class="form-control" name="password" required>
                     <div class="invalid-feedback">
                       please fill in your password
                     </div>
                   </div>
 
                   <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="4">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">
                       Login
                     </button>
                   </div>

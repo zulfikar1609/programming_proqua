@@ -7,7 +7,12 @@ use CodeIgniter\Router\RouteCollection;
  */
 // $routes->get('/', 'Home::index');
 $routes->get('/', 'LoginController::index');
-$routes->get('/asesmen', 'DashboardController::asesmen');
-$routes->get('/pendaftaran', 'DashboardController::pendaftaran');
-$routes->get('/pasien', 'DashboardController::pasien');
-$routes->get('/kunjungan', 'DashboardController::kunjungan');
+$routes->post('/auth', 'LoginController::auth');
+$routes->get('/logout', 'LoginController::logout');
+
+$routes->get('/dashboard', 'DashboardController::index', ['filter' => 'auth']);
+$routes->get('/asesmen', 'DashboardController::asesmen', ['filter' => 'role:superadmin,perawat']);
+$routes->get('/pendaftaran', 'DashboardController::pendaftaran', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->get('/pasien', 'DashboardController::pasien', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->get('/kunjungan', 'DashboardController::kunjungan', ['filter' => 'role:superadmin,admisi,perawat']);
+

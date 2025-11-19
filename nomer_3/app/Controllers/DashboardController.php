@@ -4,6 +4,13 @@ namespace App\Controllers;
 
 class DashboardController extends BaseController {
 
+    public function index()
+    {
+        $data = [
+            'active' => 'dashboard'
+        ];
+        return view('dashboard', $data);
+    }
     public function asesmen()
     {
         $data = [
