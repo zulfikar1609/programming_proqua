@@ -21,7 +21,7 @@
                 <div class="card">
                   <?php if (session('role') != 'perawat'): ?>
                   <div class="card-header">
-                        <button class="btn btn-success">Tambah</button>
+                        <button class="btn btn-success" data-toggle="modal" data-target="#tambahModal">Tambah</button>
                   </div>
                   <?php endif; ?>
                   <div class="card-body">
@@ -49,8 +49,8 @@
                             <td>
                                 <a href="#" class="btn btn-danger"><i class="fas fa-file-pdf"></i></a>
                                 <?php if (session('role') != 'perawat'): ?>
-                                  <a href="#" class="btn btn-primary">Edit</a>
-                                  <a href="#" class="btn btn-warning">Hapus</a>
+                                  <button data-toggle="modal" data-target="#editModal" class="btn btn-primary">Edit</button>
+                                  <a href="#" class="btn btn-warning btn-delete">Hapus</a>
                                 <?php endif; ?>
                             </td>
                           </tr>
@@ -63,6 +63,44 @@
             </div>
           </div>
         </section>
+          <div class="modal fade" tabindex="-1" role="dialog" id="tambahModal">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Tambah Pendaftaran</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal fade" tabindex="-1" role="dialog" id="editModal">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Edit Pendaftaran</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
       
 
 <?= $this->endSection() ?>

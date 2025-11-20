@@ -57,9 +57,13 @@
   <script src="<?= base_url('stisla/dist/assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') ?>"></script>
   <script src="<?= base_url('stisla/dist/assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js') ?>"></script>
   <script src="<?= base_url('stisla/dist/assets/modules/jquery-ui/jquery-ui.min.js') ?>"></script>
+  <script src="<?= base_url('assets/modules/prism/prism.js') ?>"></script>
+  <script src="<?= base_url('assets/modules/sweetalert/sweetalert.min.js') ?>"></script>
 
   <!-- Page Specific JS File -->
   <script src="<?= base_url('stisla/dist/assets/js/page/modules-datatables.js') ?>"></script>
+  <script src="<?= base_url('/js/page/bootstrap-modal.js') ?>"></script>
+  <script src="<?= base_url('assets/js/page/modules-sweetalert.js') ?>"></script>
   
   <!-- Template JS File -->
   <script src="<?= base_url('stisla/dist/assets/js/scripts.js') ?>"></script>
@@ -110,7 +114,55 @@
       $('.sidebar-menu a[href="' + url + '"]').closest("li").addClass("active");
   };
   </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<script>
+$(document).on("click", ".btn-delete", function(e) {
+    e.preventDefault();
+
+    let url = $(this).attr("href");
+    let row = $(this).closest("tr");
+
+    Swal.fire({
+        title: "Yakin ingin menghapus?",
+        text: "Data yang dihapus tidak bisa dikembalikan!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Ya, hapus!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+
+            // AJAX DELETE
+            $.ajax({
+                url: url,
+                type: "POST",
+                success: function(res) {
+                    Swal.fire(
+                        "Berhasil!",
+                        "Data sudah dihapus.",
+                        "success"
+                    );
+
+                    // Hapus row dari tabel tanpa reload
+                    row.fadeOut(500, function() {
+                        $(this).remove();
+                    });
+                },
+                error: function() {
+                    Swal.fire(
+                        "Gagal!",
+                        "Terjadi kesalahan pada server",
+                        "error"
+                    );
+                }
+            });
+
+        }
+    });
+});
+</script>
 
 
 
