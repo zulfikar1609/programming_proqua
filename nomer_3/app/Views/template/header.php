@@ -65,59 +65,53 @@
   <script src="<?= base_url('stisla/dist/assets/js/scripts.js') ?>"></script>
   <script src="<?= base_url('stisla/dist/assets/js/custom.js') ?>"></script>
   <script>
+  // Fungsi Re-init semua plugin setelah AJAX load
+  function reinitPlugins() {
+      // Re-init DataTable
+      if ($('#table-1').length) {
+          $('#table-1').DataTable();
+      }
+  }
+
+  // EVENT KLIK MENU
   $(document).on("click", ".ajax-link", function(e) {
       e.preventDefault();
 
       let url = $(this).attr("href");
 
+      // Spinner
       $("#main-content").html(
-        '<div class="text-center p-5"><div class="spinner-border"></div></div>'
+          '<div class="text-center p-5"><div class="spinner-border"></div></div>'
       );
 
-      $("#main-content").load(url + " #main-content > *");
+      // Update URL tanpa reload
+      history.pushState(null, null, url);
+
+      // Update menu aktif
+      $(".sidebar-menu li").removeClass("active");
+      $(this).closest("li").addClass("active");
+
+      // Load konten halaman + re-init plugin
+      $("#main-content").load(url + " #main-content > *", function() {
+          reinitPlugins();
+      });
   });
+
+  // EVENT TEKAN BACK/FORWARD BROWSER
+  window.onpopstate = function () {
+      let url = location.href;
+
+      $("#main-content").load(url + " #main-content > *", function() {
+          reinitPlugins();
+      });
+
+      // Update sidebar otomatis
+      $(".sidebar-menu li").removeClass("active");
+      $('.sidebar-menu a[href="' + url + '"]').closest("li").addClass("active");
+  };
   </script>
-  <script>
-$(document).on("click", ".ajax-link", function(e) {
-    e.preventDefault();
 
-    let url = $(this).attr("href");
 
-    // ------------------------------
-    // 1. Update URL tanpa reload
-    // ------------------------------
-    history.pushState(null, null, url);
-
-    // ------------------------------
-    // 2. Update active menu
-    // ------------------------------
-    $(".sidebar-menu li").removeClass("active");
-    $(this).closest("li").addClass("active");
-
-    // ------------------------------
-    // 3. Load content SPA
-    // ------------------------------
-    $("#main-content").html(
-      '<div class="text-center p-5"><div class="spinner-border"></div></div>'
-    );
-
-    $("#main-content").load(url + " #main-content > *");
-});
-
-// ------------------------------
-// 4. Support tombol BACK browser
-// ------------------------------
-window.onpopstate = function () {
-    let url = location.href;
-    $("#main-content").load(url + " #main-content > *");
-
-    // update active otomatis berdasar URL
-    $(".sidebar-menu li").removeClass("active");
-    $('.sidebar-menu a[href="' + url + '"]')
-        .closest("li")
-        .addClass("active");
-};
-</script>
 
 
 </body>
