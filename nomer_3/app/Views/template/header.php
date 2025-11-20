@@ -36,7 +36,9 @@
       <?= $this->include('template/sidebar') ?>
 
       <!-- Main Content -->
-      <?= $this->renderSection('content') ?>
+      <div class="main-content" id="main-content">
+        <?= $this->renderSection('content') ?>
+      </div>
       <?= $this->include('template/footer') ?>
     </div>
   </div>
@@ -62,5 +64,61 @@
   <!-- Template JS File -->
   <script src="<?= base_url('stisla/dist/assets/js/scripts.js') ?>"></script>
   <script src="<?= base_url('stisla/dist/assets/js/custom.js') ?>"></script>
+  <script>
+  $(document).on("click", ".ajax-link", function(e) {
+      e.preventDefault();
+
+      let url = $(this).attr("href");
+
+      $("#main-content").html(
+        '<div class="text-center p-5"><div class="spinner-border"></div></div>'
+      );
+
+      $("#main-content").load(url + " #main-content > *");
+  });
+  </script>
+  <script>
+$(document).on("click", ".ajax-link", function(e) {
+    e.preventDefault();
+
+    let url = $(this).attr("href");
+
+    // ------------------------------
+    // 1. Update URL tanpa reload
+    // ------------------------------
+    history.pushState(null, null, url);
+
+    // ------------------------------
+    // 2. Update active menu
+    // ------------------------------
+    $(".sidebar-menu li").removeClass("active");
+    $(this).closest("li").addClass("active");
+
+    // ------------------------------
+    // 3. Load content SPA
+    // ------------------------------
+    $("#main-content").html(
+      '<div class="text-center p-5"><div class="spinner-border"></div></div>'
+    );
+
+    $("#main-content").load(url + " #main-content > *");
+});
+
+// ------------------------------
+// 4. Support tombol BACK browser
+// ------------------------------
+window.onpopstate = function () {
+    let url = location.href;
+    $("#main-content").load(url + " #main-content > *");
+
+    // update active otomatis berdasar URL
+    $(".sidebar-menu li").removeClass("active");
+    $('.sidebar-menu a[href="' + url + '"]')
+        .closest("li")
+        .addClass("active");
+};
+</script>
+
+
 </body>
 </html>

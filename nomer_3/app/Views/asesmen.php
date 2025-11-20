@@ -2,7 +2,6 @@
 
 <?= $this->section('content') ?>
 
-      <div class="main-content">
         <section class="section">
           <div class="section-header">
             <h1>Asesmen</h1>
@@ -59,6 +58,5 @@
             </div>
           </div>
         </section>
-      </div>
 
 <?= $this->endSection() ?>
