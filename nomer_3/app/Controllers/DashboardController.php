@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\PasienModel;
+use App\Models\PendaftaranModel;
 use Dompdf\Dompdf;
 
 class DashboardController extends BaseController {
@@ -143,10 +144,111 @@ class DashboardController extends BaseController {
 
     public function pendaftaran()
     {
+        $pendaftaran = new PendaftaranModel();
+        $pasien = new PasienModel();
         $data = [
-            'active' => 'pendaftaran'
+            'active' => 'pendaftaran',
+            'pasien' => $pasien->findAll(),
+            'pendaftaran' => $pendaftaran->select('pendaftaran.*, pasien.nama')
+                            ->join('pasien', 'pasien.id = pendaftaran.pasienid')
+                            ->findAll()
         ];
         return view('pendaftaran', $data);
+    }
+
+    public function simpanPendaftaran()
+    {
+        helper(['form']); // untuk validasi
+
+        // Ambil data dari POST
+        $pasienid = $this->request->getPost('pasienid');
+        $noregistrasi = $this->request->getPost('noregistrasi');
+        $tglregistrasi = $this->request->getPost('tglregistrasi');
+
+        // Validasi required
+        if(empty($pasienid) || empty($noregistrasi) || empty($tglregistrasi)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Semua field wajib diisi!'
+            ]);
+        }
+
+        $pendaftaranModel = new PendaftaranModel();
+
+        $data = [
+            'pasienid' => $pasienid,
+            'noregistrasi' => $noregistrasi,
+            'tglregistrasi' => $tglregistrasi
+        ];
+
+        if($pendaftaranModel->insert($data)){
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Data pendaftaran berhasil disimpan!'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data pendaftaran.'
+            ]);
+        }
+    }
+
+    public function updatePendaftaran() 
+    {
+        $id = $this->request->getPost('id');
+        $data = [
+            'pasienid' => $this->request->getPost('pasienid'),
+            'noregistrasi' => $this->request->getPost('noregistrasi'),
+            'tglregistrasi' => $this->request->getPost('tglregistrasi'),
+        ];
+
+        $pendaftaranModel = new PendaftaranModel();
+        if($pendaftaranModel->update($id, $data)){
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data pendaftaran berhasil diupdate']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal update data pendaftaran']);
+        }
+    }
+
+    public function hapusPendaftaran() 
+    {
+        $id = $this->request->getPost('id');
+
+        $pendaftaranModel = new PendaftaranModel();
+        if($pendaftaranModel->delete($id)){
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data pendaftaran berhasil dihapus']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menghapus data pendaftaran']);
+        }
+    }
+
+    public function cetakPendaftaran($id)
+    {
+        $pendaftaranModel = new PendaftaranModel();
+        $pendaftaran = $pendaftaranModel->select('pendaftaran.*, pasien.nama')
+                                        ->join('pasien', 'pasien.id = pendaftaran.pasienid')    
+                                        ->find($id); // Ambil 1 data pasien
+
+        if (!$pendaftaran) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Data pasien tidak ditemukan');
+        }
+
+        // Load view cetak
+        $html = view('pendaftaran_cetak', ['pendaftaran' => $pendaftaran]);
+
+        // Inisialisasi Dompdf
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+
+        // Setting ukuran kertas dan orientasi
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render PDF
+        $dompdf->render();
+
+        // Output ke browser
+        $dompdf->stream("pendaftaran_{$pendaftaran->nama}.pdf", ['Attachment' => false]);
     }
     public function kunjungan()
     {

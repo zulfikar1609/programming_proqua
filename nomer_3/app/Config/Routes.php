@@ -15,6 +15,10 @@ $routes->get('/dashboard', 'DashboardController::index', ['filter' => 'auth']);
 $routes->get('/asesmen', 'DashboardController::asesmen', ['filter' => 'role:superadmin,perawat']);
 
 $routes->get('/pendaftaran', 'DashboardController::pendaftaran', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->post('/pendaftaran/tambah', 'DashboardController::simpanPendaftaran', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->post('/pendaftaran/update', 'DashboardController::updatePendaftaran', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->post('/pendaftaran/hapus', 'DashboardController::hapusPendaftaran', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->get('/pendaftaran/cetak/(:num)', 'DashboardController::cetakPendaftaran/$1', ['filter' => 'role:superadmin,admisi,perawat']);
 
 $routes->get('/pasien', 'DashboardController::pasien', ['filter' => 'role:superadmin,admisi,perawat']);
 $routes->post('/pasien/tambah', 'DashboardController::simpanpasien', ['filter' => 'role:superadmin,admisi,perawat']);

@@ -20,11 +20,10 @@ class CreatePendaftaranTable extends Migration
             ],
             'noregistrasi'  => [
                 'type' => 'VARCHAR',
-                'constraint' => 50
+                'constraint' => 255
             ],
-            'rglregistrasi' => [
-                'type' => 'VARCHAR',
-                'constraint' => 50
+            'tglregistrasi' => [
+                'type' => 'DATE',
             ],
         ]);
 
