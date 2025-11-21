@@ -6,6 +6,7 @@ use App\Models\PasienModel;
 use App\Models\PendaftaranModel;
 use App\Models\KunjunganModel;
 use App\Models\JenisKunjunganModel;
+use App\Models\AsesmenModel;
 use Dompdf\Dompdf;
 
 class DashboardController extends BaseController {
@@ -136,7 +137,7 @@ class DashboardController extends BaseController {
 
             $pasienModel->insert([
                 'nama' => $item['name'],
-                'norm' => $item['username'],
+                'norm' => $item['id'],
                 'alamat' => $alamat
             ]);
         }
@@ -368,8 +369,19 @@ class DashboardController extends BaseController {
     }
     public function asesmen()
     {
+        $kunjungan = new KunjunganModel();
+        $asesmen = new AsesmenModel();
         $data = [
-            'active' => 'asesmen'
+            'active' => 'asesmen',
+            'kunjungan' => $kunjungan->select('kunjungan.*, pasien.nama')
+                            ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
+                            ->join('pasien', 'pasien.id = pendaftaran.pasienid')
+                            ->findAll(),
+            'asesmen'   => $asesmen->select('asesmen.*, pasien.nama')
+                            ->join('kunjungan','kunjungan.id = asesmen.kunjunganid')
+                            ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
+                            ->join('pasien', 'pasien.id = pendaftaran.pasienid')
+                            ->findAll(),
         ];
         return view('asesmen', $data);
     }

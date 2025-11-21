@@ -35,20 +35,23 @@
                             <th>Action</th>
                           </tr>
                         </thead>
-                        <tbody>                                 
+                        <tbody> 
+                          <?php $no = 1; ?>
+                          <?php foreach($asesmen as $as): ?>                                    
                           <tr>
                             <td>
-                              1
+                              <?=$no++?>
                             </td>
-                            <td>Create a mobile app</td>
-                            <td>2018-01-20</td>
-                            <td>Perut mules</td>
+                            <td><?=$as->nama ?></td>
+                            <td><?=$as->keluhan_utama ?></td>
+                            <td><?=$as->keluhan_tambahan ?></td>
                             <td>
                                 <a href="#" class="btn btn-danger"><i class="fas fa-file-pdf"></i></a>
                                 <button data-toggle="modal" data-target="#editModal" class="btn btn-primary">Edit</button>
                                 <a href="#" class="btn btn-warning btn-delete">Hapus</a>
                             </td>
                           </tr>
+                          <?php endforeach ?>
                         </tbody>
                       </table>
                     </div>
