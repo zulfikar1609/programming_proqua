@@ -28,4 +28,8 @@ $routes->get('/pasien/import-dummy', 'DashboardController::importDummy', ['filte
 $routes->get('/pasien/cetak/(:num)', 'DashboardController::cetakPasien/$1', ['filter' => 'role:superadmin,admisi,perawat']);
 
 $routes->get('/kunjungan', 'DashboardController::kunjungan', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->post('/kunjungan/tambah', 'DashboardController::simpanKunjungan', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->post('/kunjungan/update', 'DashboardController::updateKunjungan', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->post('/kunjungan/hapus', 'DashboardController::hapusKunjungan', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->get('/kunjungan/cetak/(:num)', 'DashboardController::cetakKunjungan/$1', ['filter' => 'role:superadmin,admisi,perawat']);
 

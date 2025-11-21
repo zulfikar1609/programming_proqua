@@ -117,6 +117,7 @@
 
   <?= $this->include('scripts/pasienscript') ?>
   <?= $this->include('scripts/pendaftaranscript') ?>
+  <?= $this->include('scripts/kunjunganscript') ?>
 
 
 

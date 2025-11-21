@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Models\PasienModel;
 use App\Models\PendaftaranModel;
+use App\Models\KunjunganModel;
+use App\Models\JenisKunjunganModel;
 use Dompdf\Dompdf;
 
 class DashboardController extends BaseController {
@@ -252,10 +254,117 @@ class DashboardController extends BaseController {
     }
     public function kunjungan()
     {
+        $pendaftaran = new PendaftaranModel();
+        $kunjungan = new KunjunganModel();
+        $jenis_kunjungan = new JenisKunjunganModel();
         $data = [
-            'active' => 'kunjungan'
+            'active' => 'kunjungan',
+            'pendaftaran' => $pendaftaran->select('pendaftaran.*, pasien.nama')
+                            ->join('pasien', 'pasien.id = pendaftaran.pasienid')
+                            ->findAll(),
+            'kunjungan' => $kunjungan->select('kunjungan.*, pasien.nama')
+                            ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
+                            ->join('pasien', 'pasien.id = pendaftaran.pasienid')
+                            ->findAll(),
+            'jenis_kunjungan' =>$jenis_kunjungan->findAll()
         ];
         return view('kunjungan',$data);
+    }
+
+    public function simpanKunjungan()
+    {
+        helper(['form']); // untuk validasi
+
+        // Ambil data dari POST
+        $pendaftaranpasienid = $this->request->getPost('pendaftaranpasienid');
+        $jenis_kunjungan = $this->request->getPost('jenis_kunjungan');
+        $tglkunjungan = $this->request->getPost('tglkunjungan');
+
+        // Validasi required
+        if(empty($pendaftaranpasienid) || empty($jenis_kunjungan) || empty($tglkunjungan)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Semua field wajib diisi!'
+            ]);
+        }
+
+        $kunjunganModel = new KunjunganModel();
+
+        $data = [
+            'pendaftaranpasienid' => $pendaftaranpasienid,
+            'jenis_kunjungan' => $jenis_kunjungan,
+            'tglkunjungan' => $tglkunjungan
+        ];
+
+        if($kunjunganModel->insert($data)){
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Data kunjungan berhasil disimpan!'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data kunjungan.'
+            ]);
+        }
+    }
+
+    public function updateKunjungan() 
+    {
+        $id = $this->request->getPost('id');
+        $data = [
+            'pendaftaranpasienid' => $this->request->getPost('pendaftaranpasienid'),
+            'jenis_kunjungan' => $this->request->getPost('jenis_kunjungan'),
+            'tglkunjungan' => $this->request->getPost('tglkunjungan'),
+        ];
+
+        $kunjunganModel = new KunjunganModel();
+        if($kunjunganModel->update($id, $data)){
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data kunjungan berhasil diupdate']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal update data kunjungan']);
+        }
+    }
+
+    public function hapusKunjungan() 
+    {
+        $id = $this->request->getPost('id');
+
+        $kunjunganModel = new KunjunganModel();
+        if($kunjunganModel->delete($id)){
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data kunjungan berhasil dihapus']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menghapus data kunjungan']);
+        }
+    }
+
+    public function cetakKunjungan($id)
+    {
+        $kunjunganModel = new KunjunganModel();
+        $kunjungan = $kunjunganModel->select('kunjungan.*, pasien.nama')
+                                    ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
+                                    ->join('pasien', 'pasien.id = pendaftaran.pasienid')    
+                                    ->find($id); // Ambil 1 data pasien
+
+        if (!$kunjungan) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Data pasien tidak ditemukan');
+        }
+
+        // Load view cetak
+        $html = view('kunjungan_cetak', ['kunjungan' => $kunjungan]);
+
+        // Inisialisasi Dompdf
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+
+        // Setting ukuran kertas dan orientasi
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render PDF
+        $dompdf->render();
+
+        // Output ke browser
+        $dompdf->stream("kunjungan_{$kunjungan->nama}.pdf", ['Attachment' => false]);
     }
     public function asesmen()
     {
