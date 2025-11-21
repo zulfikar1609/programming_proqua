@@ -21,6 +21,7 @@
                 <div class="card">
                   <div class="card-header">
                     <button class="btn btn-success" data-toggle="modal" data-target="#tambahModal">Tambah</button>
+                    <button class="btn btn-success" id="btnImportDummy">Import Dummy</button>
                   </div>
                   <div class="card-body">
                     <div class="table-responsive">
@@ -36,20 +37,27 @@
                             <th>Action</th>
                           </tr>
                         </thead>
-                        <tbody>                                 
+                        <tbody> 
+                          <?php $no = 1; ?>
+                          <?php foreach($pasien as $ps): ?>                              
                           <tr>
                             <td>
-                              1
+                              <?=$no++?>
                             </td>
-                            <td>Create a mobile app</td>
-                            <td>2018-01-20</td>
-                            <td>Perut mules</td>
+                            <td><?=$ps->nama ?></td>
+                            <td><?=$ps->norm ?></td>
+                            <td><?=$ps->alamat ?></td>
                             <td>
-                                <a href="#" class="btn btn-danger"><i class="fas fa-file-pdf"></i></a>
-                                <button data-toggle="modal" data-target="#editModal" class="btn btn-primary">Edit</button>
-                                <a href="#" class="btn btn-warning btn-delete">Hapus</a>
+                                <a href="<?= base_url('pasien/cetak/'.$ps->id) ?>" class="btn btn-danger" target="_blank"><i class="fas fa-file-pdf"></i></a>
+                                <button data-toggle="modal" data-target="#editModal" class="btn btn-primary btn-edit" 
+                                  data-id="<?= $ps->id ?>" 
+                                  data-nama="<?= $ps->nama ?>" 
+                                  data-norm="<?= $ps->norm ?>" 
+                                  data-alamat="<?= $ps->alamat ?>">Edit</button>
+                                <a href="#" class="btn btn-warning btn-delete" data-id="<?= $ps->id ?>">Hapus</a>
                             </td>
                           </tr>
+                          <?php endforeach ?>
                         </tbody>
                       </table>
                     </div>
@@ -69,11 +77,26 @@
                   </button>
                 </div>
                 <div class="modal-body">
-                  <p>Modal body text goes here.</p>
+                  <form id="formTambah">
+                    <div class="form-group">
+                      <label>Nama Pasien</label>
+                      <input type="text" class="form-control" name="nama" required>
+                    </div>
+
+                    <div class="form-group">
+                      <label>No. Rekam Medis</label>
+                      <input type="text" class="form-control" name="norm" required>
+                    </div>
+
+                    <div class="form-group">
+                      <label>Alamat</label>
+                      <textarea class="form-control" name="alamat" required></textarea>
+                    </div>
+                  </form>
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Save</button>
+                  <button type="button" class="btn btn-primary" id="btnSimpan">Save</button>
                 </div>
               </div>
             </div>
@@ -88,15 +111,32 @@
                   </button>
                 </div>
                 <div class="modal-body">
-                  <p>Modal body text goes here.</p>
+                  <form id="formEdit">
+                    <input type="hidden" name="id" id="editId">
+                    <div class="form-group">
+                        <label>Nama Pasien</label>
+                        <input type="text" class="form-control" name="nama" id="editNama" required>
+                    </div>
+                    <div class="form-group">
+                        <label>No. Rekam Medis</label>
+                        <input type="text" class="form-control" name="norm" id="editNorm" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Alamat</label>
+                        <textarea class="form-control" name="alamat" id="editAlamat" required></textarea>
+                    </div>
+                  </form>
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Save</button>
+                  <button type="button" class="btn btn-primary" id="btnUpdate">Save</button>
                 </div>
               </div>
             </div>
           </div>
+
+   
+
       
 
 <?= $this->endSection() ?>

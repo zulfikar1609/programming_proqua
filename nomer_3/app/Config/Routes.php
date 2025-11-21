@@ -11,8 +11,17 @@ $routes->post('/auth', 'LoginController::auth');
 $routes->get('/logout', 'LoginController::logout');
 
 $routes->get('/dashboard', 'DashboardController::index', ['filter' => 'auth']);
+
 $routes->get('/asesmen', 'DashboardController::asesmen', ['filter' => 'role:superadmin,perawat']);
+
 $routes->get('/pendaftaran', 'DashboardController::pendaftaran', ['filter' => 'role:superadmin,admisi,perawat']);
+
 $routes->get('/pasien', 'DashboardController::pasien', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->post('/pasien/tambah', 'DashboardController::simpanpasien', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->post('/pasien/update', 'DashboardController::updatePasien', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->post('/pasien/hapus', 'DashboardController::hapusPasien', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->get('/pasien/import-dummy', 'DashboardController::importDummy', ['filter' => 'role:superadmin,admisi,perawat']);
+$routes->get('/pasien/cetak/(:num)', 'DashboardController::cetakPasien/$1', ['filter' => 'role:superadmin,admisi,perawat']);
+
 $routes->get('/kunjungan', 'DashboardController::kunjungan', ['filter' => 'role:superadmin,admisi,perawat']);
 

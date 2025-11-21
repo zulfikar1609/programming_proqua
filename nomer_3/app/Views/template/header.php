@@ -57,17 +57,17 @@
   <script src="<?= base_url('stisla/dist/assets/modules/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') ?>"></script>
   <script src="<?= base_url('stisla/dist/assets/modules/datatables/Select-1.2.4/js/dataTables.select.min.js') ?>"></script>
   <script src="<?= base_url('stisla/dist/assets/modules/jquery-ui/jquery-ui.min.js') ?>"></script>
-  <script src="<?= base_url('assets/modules/prism/prism.js') ?>"></script>
-  <script src="<?= base_url('assets/modules/sweetalert/sweetalert.min.js') ?>"></script>
+  <script src="<?= base_url('stisla/dist/assets/modules/prism/prism.js') ?>"></script>
 
   <!-- Page Specific JS File -->
   <script src="<?= base_url('stisla/dist/assets/js/page/modules-datatables.js') ?>"></script>
-  <script src="<?= base_url('/js/page/bootstrap-modal.js') ?>"></script>
-  <script src="<?= base_url('assets/js/page/modules-sweetalert.js') ?>"></script>
+  <script src="<?= base_url('stisla/dist/assets/js/page/bootstrap-modal.js') ?>"></script>
   
   <!-- Template JS File -->
   <script src="<?= base_url('stisla/dist/assets/js/scripts.js') ?>"></script>
   <script src="<?= base_url('stisla/dist/assets/js/custom.js') ?>"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script>
   // Fungsi Re-init semua plugin setelah AJAX load
   function reinitPlugins() {
@@ -114,55 +114,212 @@
       $('.sidebar-menu a[href="' + url + '"]').closest("li").addClass("active");
   };
   </script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-$(document).on("click", ".btn-delete", function(e) {
-    e.preventDefault();
+$(document).ready(function() {
+    $(document).on('click', '#btnSimpan', function() {
+        var form = $('#formTambah')[0];
 
-    let url = $(this).attr("href");
-    let row = $(this).closest("tr");
-
-    Swal.fire({
-        title: "Yakin ingin menghapus?",
-        text: "Data yang dihapus tidak bisa dikembalikan!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Ya, hapus!"
-    }).then((result) => {
-        if (result.isConfirmed) {
-
-            // AJAX DELETE
-            $.ajax({
-                url: url,
-                type: "POST",
-                success: function(res) {
-                    Swal.fire(
-                        "Berhasil!",
-                        "Data sudah dihapus.",
-                        "success"
-                    );
-
-                    // Hapus row dari tabel tanpa reload
-                    row.fadeOut(500, function() {
-                        $(this).remove();
-                    });
-                },
-                error: function() {
-                    Swal.fire(
-                        "Gagal!",
-                        "Terjadi kesalahan pada server",
-                        "error"
-                    );
-                }
+        if (!form.checkValidity()) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Semua field wajib diisi!'
             });
+            return;
+        }
 
+        var formData = new FormData(form);
+
+        $.ajax({
+            url: "<?= base_url('/pasien/tambah') ?>",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function(response) {
+                if(response.status === 'success'){
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sukses',
+                        text: response.message
+                    }).then(() => {
+                        $('#tambahModal').modal('hide');
+                        form.reset();
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.log(xhr.responseText);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Terjadi kesalahan server.'
+                });
+            }
+        });
+    });
+});
+
+$(document).on('click', '.btn-edit', function() {
+    var id = $(this).data('id');
+    var nama = $(this).data('nama');
+    var norm = $(this).data('norm');
+    var alamat = $(this).data('alamat');
+
+    $('#editId').val(id);
+    $('#editNama').val(nama);
+    $('#editNorm').val(norm);
+    $('#editAlamat').val(alamat);
+});
+
+$(document).on('click', '#btnUpdate', function() {
+    var form = $('#formEdit')[0];
+
+    if (!form.checkValidity()) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Semua field wajib diisi!'
+        });
+        return;
+    }
+
+    var formData = new FormData(form);
+
+    $.ajax({
+        url: "<?= base_url('/pasien/update') ?>", // route update
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: "json",
+        success: function(response) {
+            if(response.status === 'success'){
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sukses',
+                    text: response.message
+                }).then(() => {
+                    $('#editModal').modal('hide');
+                    form.reset();
+                    location.reload(); // atau reload DataTable
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: response.message
+                });
+            }
+        },
+        error: function(xhr) {
+            console.log(xhr.responseText);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Terjadi kesalahan server.'
+            });
         }
     });
 });
+
+$(document).on('click', '.btn-delete', function(e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+
+    Swal.fire({
+        title: 'Yakin ingin menghapus?',
+        text: "Data pasien akan dihapus permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "<?= base_url('/pasien/hapus') ?>",
+                type: "POST",
+                data: { id: id },
+                dataType: "json",
+                success: function(response) {
+                    if(response.status === 'success'){
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Terhapus',
+                            text: response.message
+                        }).then(() => {
+                            location.reload(); // atau reload DataTable
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Terjadi kesalahan server.'
+                    });
+                }
+            });
+        }
+    });
+});
+
+$(document).ready(function() {
+    $('#btnImportDummy').click(function() {
+        Swal.fire({
+            title: 'Apakah yakin?',
+            text: "Data dummy pasien akan diimport!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, import!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "<?= base_url('/pasien/import-dummy') ?>",
+                    type: "GET",
+                    success: function() {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'Dummy data pasien telah diimport.'
+                        }).then(() => {
+                            location.reload(); // reload halaman untuk lihat data
+                        });
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Terjadi kesalahan saat import.'
+                        });
+                    }
+                });
+            }
+        });
+    });
+});
 </script>
+
 
 
 
