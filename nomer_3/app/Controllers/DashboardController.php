@@ -377,13 +377,110 @@ class DashboardController extends BaseController {
                             ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
                             ->join('pasien', 'pasien.id = pendaftaran.pasienid')
                             ->findAll(),
-            'asesmen'   => $asesmen->select('asesmen.*, pasien.nama')
+            'asesmen'   => $asesmen->select('asesmen.*, pasien.nama, kunjungan.jenis_kunjungan')
                             ->join('kunjungan','kunjungan.id = asesmen.kunjunganid')
                             ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
                             ->join('pasien', 'pasien.id = pendaftaran.pasienid')
                             ->findAll(),
         ];
         return view('asesmen', $data);
+    }
+
+    public function simpanAsesmen()
+    {
+        helper(['form']); // untuk validasi
+
+        // Ambil data dari POST
+        $kunjunganid = $this->request->getPost('kunjunganid');
+        $keluhan_utama = $this->request->getPost('keluhan_utama');
+        $keluhan_tambahan = $this->request->getPost('keluhan_tambahan');
+
+        // Validasi required
+        if(empty($kunjunganid) || empty($keluhan_utama) || empty($keluhan_tambahan)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Semua field wajib diisi!'
+            ]);
+        }
+
+        $asesmenModel = new AsesmenModel();
+
+        $data = [
+            'kunjunganid' => $kunjunganid,
+            'keluhan_utama' => $keluhan_utama,
+            'keluhan_tambahan' => $keluhan_tambahan
+        ];
+
+        if($asesmenModel->insert($data)){
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Data asesmen berhasil disimpan!'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data asesmen.'
+            ]);
+        }
+    }
+
+    public function updateAsesmen() 
+    {
+        $id = $this->request->getPost('id');
+        $data = [
+            'kunjunganid' => $this->request->getPost('kunjunganid'),
+            'keluhan_utama' => $this->request->getPost('keluhan_utama'),
+            'keluhan_tambahan' => $this->request->getPost('keluhan_tambahan'),
+        ];
+
+        $asesmenModel = new AsesmenModel();
+        if($asesmenModel->update($id, $data)){
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data asesmen berhasil diupdate']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal update data asesmen']);
+        }
+    }
+
+    public function hapusAsesmen() 
+    {
+        $id = $this->request->getPost('id');
+
+        $asesmenModel = new AsesmenModel();
+        if($asesmenModel->delete($id)){
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data asesmen berhasil dihapus']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menghapus data asesmen']);
+        }
+    }
+
+    public function cetakAsesmen($id)
+    {
+        $asesmenModel = new AsesmenModel();
+        $asesmen = $asesmenModel->select('asesmen.*, pasien.nama, kunjungan.jenis_kunjungan')
+                                    ->join('kunjungan','kunjungan.id = asesmen.kunjunganid')
+                                    ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
+                                    ->join('pasien', 'pasien.id = pendaftaran.pasienid')    
+                                    ->find($id); // Ambil 1 data pasien
+
+        if (!$asesmen) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Data pasien tidak ditemukan');
+        }
+
+        // Load view cetak
+        $html = view('asesmen_cetak', ['asesmen' => $asesmen]);
+
+        // Inisialisasi Dompdf
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+
+        // Setting ukuran kertas dan orientasi
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render PDF
+        $dompdf->render();
+
+        // Output ke browser
+        $dompdf->stream("asesmen_{$asesmen->nama}.pdf", ['Attachment' => false]);
     }
 
 }

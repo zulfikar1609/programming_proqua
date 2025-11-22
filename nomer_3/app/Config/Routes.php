@@ -13,6 +13,10 @@ $routes->get('/logout', 'LoginController::logout');
 $routes->get('/dashboard', 'DashboardController::index', ['filter' => 'auth']);
 
 $routes->get('/asesmen', 'DashboardController::asesmen', ['filter' => 'role:superadmin,perawat']);
+$routes->post('/asesmen/tambah', 'DashboardController::simpanAsesmen', ['filter' => 'role:superadmin,perawat']);
+$routes->post('/asesmen/update', 'DashboardController::updateAsesmen', ['filter' => 'role:superadmin,perawat']);
+$routes->post('/asesmen/hapus', 'DashboardController::hapusAsesmen', ['filter' => 'role:superadmin,perawat']);
+$routes->get('/asesmen/cetak/(:num)', 'DashboardController::cetakAsesmen/$1', ['filter' => 'role:superadmin,perawat']);
 
 $routes->get('/pendaftaran', 'DashboardController::pendaftaran', ['filter' => 'role:superadmin,admisi,perawat']);
 $routes->post('/pendaftaran/tambah', 'DashboardController::simpanPendaftaran', ['filter' => 'role:superadmin,admisi,perawat']);
