@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cetak Pasien</title>
+    <title>Cetak Kunjungan</title>
     <style>
         body { font-family: sans-serif; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }

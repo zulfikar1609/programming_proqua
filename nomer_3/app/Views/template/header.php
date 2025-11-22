@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
-  <title>Modules &rsaquo; DataTables &mdash; Stisla</title>
+  <title><?=$title ?></title>
 
   <!-- General CSS Files -->
   <link rel="stylesheet" href="<?= base_url('stisla/dist/assets/modules/bootstrap/css/bootstrap.min.css') ?>">
@@ -98,6 +98,14 @@
       // Load konten halaman + re-init plugin
       $("#main-content").load(url + " #main-content > *", function() {
           reinitPlugins();
+
+          $.get(url, function(res) {
+              let newTitle = $(res).filter("title").text();
+              if (newTitle) {
+                  document.title = newTitle;
+              }
+          });
+
       });
   });
 
@@ -107,6 +115,14 @@
 
       $("#main-content").load(url + " #main-content > *", function() {
           reinitPlugins();
+
+          $.get(url, function(res) {
+              let newTitle = $(res).filter("title").text();
+              if (newTitle) {
+                  document.title = newTitle;
+              }
+          });
+
       });
 
       // Update sidebar otomatis
@@ -119,6 +135,7 @@
   <?= $this->include('scripts/pendaftaranscript') ?>
   <?= $this->include('scripts/kunjunganscript') ?>
   <?= $this->include('scripts/asesmenscript') ?>
+  <?= $this->include('scripts/diagnosisscript') ?>
 
 
 

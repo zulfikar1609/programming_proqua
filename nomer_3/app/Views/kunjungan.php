@@ -6,11 +6,6 @@
         <section class="section">
           <div class="section-header">
             <h1>Kunjungan</h1>
-            <div class="section-header-breadcrumb">
-              <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
-              <div class="breadcrumb-item"><a href="#">Modules</a></div>
-              <div class="breadcrumb-item">DataTables</div>
-            </div>
           </div>
 
           <div class="section-body">
@@ -35,7 +30,9 @@
                             <th>Nama Pasien</th>
                             <th>Jenis kunjungan</th>
                             <th>Tanggal Kunjungan</th>
+                            <?php if (session('role') != 'perawat'): ?>
                             <th>Action</th>
+                            <?php endif; ?>
                           </tr>
                         </thead>
                         <tbody> 
@@ -48,17 +45,17 @@
                             <td><?=$kj->nama ?></td>
                             <td><?=$kj->jenis_kunjungan ?></td>
                             <td><?=$kj->tglkunjungan ?></td>
+                            <?php if (session('role') != 'perawat'): ?>
                             <td>
                                 <a href="<?= base_url('kunjungan/cetak/'.$kj->id) ?>" class="btn btn-danger" target="_blank"><i class="fas fa-file-pdf"></i></a>
-                                <?php if (session('role') != 'perawat'): ?>
                                   <button data-toggle="modal" data-target="#editModalKunjungan" class="btn btn-primary btn-edit-kunjungan"
                                     data-id="<?= $kj->id ?>"
                                     data-pendaftaranpasienid="<?= $kj->pendaftaranpasienid ?>"
                                     data-jenis_kunjungan="<?= $kj->jenis_kunjungan ?>"
                                     data-tglkunjungan="<?= $kj->tglkunjungan ?>">Edit</button>
                                   <a href="#" class="btn btn-warning btn-delete-kunjungan" data-id="<?= $kj->id ?>">Hapus</a>
-                                <?php endif; ?>
                             </td>
+                            <?php endif; ?>
                           </tr>
                           <?php endforeach ?>
                         </tbody>

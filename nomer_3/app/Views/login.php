@@ -50,7 +50,7 @@
                     <label for="email">Email</label>
                     <input id="email" type="email" class="form-control" name="email" required autofocus>
                     <div class="invalid-feedback">
-                      Please fill in your email
+                      tolong masukan email anda
                     </div>
                   </div>
 
@@ -60,7 +60,7 @@
                     </div>
                     <input id="password" type="password" class="form-control" name="password" required>
                     <div class="invalid-feedback">
-                      please fill in your password
+                      tolong masukan password anda
                     </div>
                   </div>
 

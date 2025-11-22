@@ -7,6 +7,7 @@ use App\Models\PendaftaranModel;
 use App\Models\KunjunganModel;
 use App\Models\JenisKunjunganModel;
 use App\Models\AsesmenModel;
+use App\Models\DiagnosisModel;
 use Dompdf\Dompdf;
 
 class DashboardController extends BaseController {
@@ -14,6 +15,7 @@ class DashboardController extends BaseController {
     public function index()
     {
         $data = [
+            'title' => 'Halaman Dashboard',
             'active' => 'dashboard'
         ];
         return view('dashboard', $data);
@@ -22,6 +24,7 @@ class DashboardController extends BaseController {
     {
         $pasien = new PasienModel();
         $data = [
+            'title' => 'Halaman Pasien',
             'active' => 'pasien',
             'pasien' => $pasien->findAll(),
         ];
@@ -150,6 +153,7 @@ class DashboardController extends BaseController {
         $pendaftaran = new PendaftaranModel();
         $pasien = new PasienModel();
         $data = [
+            'title' => 'Halaman Pendafataran',
             'active' => 'pendaftaran',
             'pasien' => $pasien->findAll(),
             'pendaftaran' => $pendaftaran->select('pendaftaran.*, pasien.nama')
@@ -259,6 +263,7 @@ class DashboardController extends BaseController {
         $kunjungan = new KunjunganModel();
         $jenis_kunjungan = new JenisKunjunganModel();
         $data = [
+            'title' => 'Halaman Kunjungan',
             'active' => 'kunjungan',
             'pendaftaran' => $pendaftaran->select('pendaftaran.*, pasien.nama')
                             ->join('pasien', 'pasien.id = pendaftaran.pasienid')
@@ -372,6 +377,7 @@ class DashboardController extends BaseController {
         $kunjungan = new KunjunganModel();
         $asesmen = new AsesmenModel();
         $data = [
+            'title' => 'Halaman Asesmen',
             'active' => 'asesmen',
             'kunjungan' => $kunjungan->select('kunjungan.*, pasien.nama')
                             ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
@@ -481,6 +487,126 @@ class DashboardController extends BaseController {
 
         // Output ke browser
         $dompdf->stream("asesmen_{$asesmen->nama}.pdf", ['Attachment' => false]);
+    }
+
+    public function diagnosis()
+    {
+        $diagnosis = new DiagnosisModel();
+        $asesmen = new AsesmenModel();
+        $data = [
+            'title' => 'Halaman Diagnosis',
+            'active'      => 'diagnosis',
+            'asesmen'     => $asesmen->select('asesmen.*, pasien.nama')
+                            ->join('kunjungan','kunjungan.id = asesmen.kunjunganid')
+                            ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
+                            ->join('pasien', 'pasien.id = pendaftaran.pasienid')
+                            ->findAll(),
+            'diagnosis'   => $diagnosis->select('diagnosis.*, pasien.nama, asesmen.keluhan_utama, asesmen.keluhan_tambahan')
+                            ->join('asesmen','asesmen.id = diagnosis.asesmenid')
+                            ->join('kunjungan','kunjungan.id = asesmen.kunjunganid')
+                            ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
+                            ->join('pasien', 'pasien.id = pendaftaran.pasienid')
+                            ->findAll(),
+        ];
+        return view('diagnosis', $data);
+    }
+
+    public function simpanDiagnosis()
+    {
+        helper(['form']); // untuk validasi
+
+        // Ambil data dari POST
+        $asesmenid = $this->request->getPost('asesmenid');
+        $diagnosa = $this->request->getPost('diagnosa');
+        $tindakan_penanganan = $this->request->getPost('tindakan_penanganan');
+
+        // Validasi required
+        if(empty($asesmenid) || empty($diagnosa) || empty($tindakan_penanganan)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Semua field wajib diisi!'
+            ]);
+        }
+
+        $diagnosisModel = new DiagnosisModel();
+
+        $data = [
+            'asesmenid' => $asesmenid,
+            'diagnosa' => $diagnosa,
+            'tindakan_penanganan' => $tindakan_penanganan
+        ];
+
+        if($diagnosisModel->insert($data)){
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => 'Data diagnosis berhasil disimpan!'
+            ]);
+        } else {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Gagal menyimpan data diagnosis.'
+            ]);
+        }
+    }
+
+    public function updateDiagnosis() 
+    {
+        $id = $this->request->getPost('id');
+        $data = [
+            'asesmenid' => $this->request->getPost('asesmenid'),
+            'diagnosa' => $this->request->getPost('diagnosa'),
+            'tindakan_penanganan' => $this->request->getPost('tindakan_penanganan'),
+        ];
+
+        $diagnosisModel = new DiagnosisModel();
+        if($diagnosisModel->update($id, $data)){
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data diagnosis berhasil diupdate']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal update data diagnosis']);
+        }
+    }
+
+    public function hapusDiagnosis() 
+    {
+        $id = $this->request->getPost('id');
+
+        $diagnosisModel = new DiagnosisModel();
+        if($diagnosisModel->delete($id)){
+            return $this->response->setJSON(['status' => 'success', 'message' => 'Data diagnosis berhasil dihapus']);
+        } else {
+            return $this->response->setJSON(['status' => 'error', 'message' => 'Gagal menghapus data diagnosis']);
+        }
+    }
+
+    public function cetakDiagnosis($id)
+    {
+        $diagnosisModel = new DiagnosisModel();
+        $diagnosis = $diagnosisModel->select('diagnosis.*, pasien.nama, asesmen.keluhan_utama, asesmen.keluhan_tambahan')
+                                    ->join('asesmen','asesmen.id = diagnosis.asesmenid')
+                                    ->join('kunjungan','kunjungan.id = asesmen.kunjunganid')
+                                    ->join('pendaftaran','pendaftaran.id = kunjungan.pendaftaranpasienid')
+                                    ->join('pasien', 'pasien.id = pendaftaran.pasienid')    
+                                    ->find($id); 
+
+        if (!$diagnosis) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Data pasien tidak ditemukan');
+        }
+
+        // Load view cetak
+        $html = view('diagnosis_cetak', ['diagnosis' => $diagnosis]);
+
+        // Inisialisasi Dompdf
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+
+        // Setting ukuran kertas dan orientasi
+        $dompdf->setPaper('A4', 'portrait');
+
+        // Render PDF
+        $dompdf->render();
+
+        // Output ke browser
+        $dompdf->stream("diagnosis_{$diagnosis->nama}.pdf", ['Attachment' => false]);
     }
 
 }

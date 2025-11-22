@@ -6,11 +6,6 @@
         <section class="section">
           <div class="section-header">
             <h1>Pendaftaran</h1>
-            <div class="section-header-breadcrumb">
-              <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
-              <div class="breadcrumb-item"><a href="#">Modules</a></div>
-              <div class="breadcrumb-item">DataTables</div>
-            </div>
           </div>
 
           <div class="section-body">
@@ -35,7 +30,9 @@
                             <th>Nama Pasien</th>
                             <th>Nomor Registrasi</th>
                             <th>Tanggal Registrasi</th>
+                            <?php if (session('role') != 'perawat'): ?>
                             <th>Action</th>
+                             <?php endif; ?>
                           </tr>
                         </thead>
                         <tbody>
@@ -48,17 +45,17 @@
                             <td><?=$pd->nama ?></td>
                             <td><?=$pd->noregistrasi ?></td>
                             <td><?=$pd->tglregistrasi ?></td>
+                            <?php if (session('role') != 'perawat'): ?>
                             <td>
                                 <a href="<?= base_url('pendaftaran/cetak/'.$pd->id) ?>" class="btn btn-danger" target="_blank"><i class="fas fa-file-pdf"></i></a>
-                                <?php if (session('role') != 'perawat'): ?>
                                   <button data-toggle="modal" data-target="#editModalPendaftaran" class="btn btn-primary btn-edit-pendaftaran"
                                     data-id="<?= $pd->id ?>"
                                     data-pasienid="<?= $pd->pasienid ?>"
                                     data-noregistrasi="<?= $pd->noregistrasi ?>"
                                     data-tglregistrasi="<?= $pd->tglregistrasi ?>">Edit</button>
                                   <a href="#" class="btn btn-warning btn-delete-pendaftaran" data-id="<?= $pd->id ?>">Hapus</a>
-                                <?php endif; ?>
                             </td>
+                            <?php endif; ?>
                           </tr>
                           <?php endforeach ?>
                         </tbody>
